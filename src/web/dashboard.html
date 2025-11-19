@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Master's Thesis: Technical Debt & Entrepreneurial Execution</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(
+          135deg,
+          #f8fafc 0%,
+          #e2e8f0 50%,
+          #cbd5e1 100%
+        );
+        min-height: 100vh;
+        color: #333;
+      }
+      .header {
+        background: white;
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .header h1 {
+        font-size: 2.8rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+      }
+      .subtitle {
+        font-size: 1.3rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+        font-weight: 500;
+      }
+      .research-question {
+        background: #f1f5f9;
+        border-left: 4px solid #1e40af;
+        padding: 1rem 1.5rem;
+        font-style: italic;
+        color: #1e40af;
+        margin: 1rem auto;
+        max-width: 900px;
+        font-size: 1.1rem;
+        border-radius: 0 8px 8px 0;
+      }
+      .header-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #1e40af, #3b82f6);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+      }
+      .header-button:hover {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+      }
+      .limitation-note {
+        background: #fef7cd;
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        color: #92400e;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+      .metric-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .metric-label {
+        font-size: 1rem;
+        color: #64748b;
+        font-weight: 500;
+      }
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      .card h2 {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+        border-bottom: 3px solid #1e40af;
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .empirical-section {
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border: 2px solid #1e40af;
+        text-align: center;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+      }
+      .empirical-title {
+        font-size: 1.8rem;
+        color: #1e40af;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      .correlation-display {
+        font-size: 4rem;
+        font-weight: bold;
+        margin: 1rem 0;
+        background: linear-gradient(135deg, #1e40af, #7c3aed);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .association-result {
+        font-size: 1.3rem;
+        font-weight: bold;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+      }
+      .association-supported {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+      }
+      .association-not-supported {
+        background: linear-gradient(135deg, #64748b, #475569);
+        color: white;
+      }
+      .correlation-section {
+        grid-column: 1 / -1;
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      .correlation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+      .correlation-card {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+      }
+      .correlation-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+      }
+      .correlation-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.5rem 0;
+      }
+
+      /* Strategic Framework Matrix - Updated Colors */
+      .strategic-matrix,
+      .strategic-matrix-3x3 {
+        display: grid;
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .strategic-matrix {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        height: 400px;
+      }
+      .strategic-matrix-3x3 {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        height: 550px;
+      }
+      .matrix-quadrant {
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+        border: 2px solid;
+      }
+      .matrix-quadrant:hover {
+        transform: translateY(-4px);
+      }
+
+      /* Updated quadrant colors based on thesis colors */
+      .quadrant-sustainable {
+        background: rgb(213, 244, 230);
+        border-color: #10b981;
+        color: #065f46;
+      }
+      .quadrant-strategic {
+        background: rgb(254, 249, 195);
+        border-color: #f59e0b;
+        color: #92400e;
+      }
+      .quadrant-premature {
+        background: rgb(219, 234, 254);
+        border-color: #3b82f6;
+        color: #1e3a8a;
+      }
+      .quadrant-trap {
+        background: rgb(254, 202, 202);
+        border-color: #ef4444;
+        color: #991b1b;
+      }
+      /* New colors for 3x3 matrix */
+      .quadrant-medium-risk {
+        background: #fef3c7; /* Lighter yellow */
+        border-color: #fca5a5;
+        color: #b91c1c;
+      }
+      .quadrant-balanced {
+        background: #e0e7ff; /* Lighter blue */
+        border-color: #a5b4fc;
+        color: #312e81;
+      }
+      .quadrant-accelerating {
+        background: #d1fae5; /* Lighter green */
+        border-color: #6ee7b7;
+        color: #047857;
+      }
+
+      .quadrant-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+      }
+      .quadrant-metric {
+        font-size: 1.1rem;
+        margin: 0.3rem 0;
+        opacity: 0.95;
+      }
+      .chart-container {
+        height: 300px;
+        margin: 1rem 0;
+      }
+      .insights-section {
+        grid-column: 1 / -1;
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      .insights-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 1.5rem;
+      }
+      .insight-card {
+        background: #f8fafc;
+        border-left: 4px solid #1e40af;
+        padding: 1.5rem;
+        border-radius: 8px;
+      }
+      .insight-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 0.8rem;
+      }
+      .insight-text {
+        color: #475569;
+        line-height: 1.6;
+      }
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #1e40af;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-right: 1rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @media (max-width: 1024px) {
+        .container {
+          padding: 0 1rem;
+        }
+        .metrics-grid {
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 1rem;
+        }
+        .metric-card {
+          padding: 1.5rem;
+        }
+        .metric-value {
+          font-size: 2rem;
+        }
+        .correlation-grid {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .strategic-matrix-3x3 {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          padding: 1.5rem;
+        }
+        .header h1 {
+          font-size: 2.2rem;
+        }
+        .subtitle {
+          font-size: 1.1rem;
+        }
+        .research-question {
+          font-size: 1rem;
+          padding: 0.8rem 1rem;
+        }
+        .header-button {
+          padding: 0.6rem 1rem;
+          font-size: 0.9rem;
+        }
+        .main-content {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+        .insights-grid {
+          grid-template-columns: 1fr;
+        }
+        .correlation-grid {
+          grid-template-columns: 1fr;
+        }
+        .strategic-matrix {
+          height: auto;
+          grid-template-columns: 1fr;
+        }
+        .matrix-quadrant {
+          padding: 1rem;
+        }
+        .quadrant-title {
+          font-size: 1rem;
+        }
+        .quadrant-metric {
+          font-size: 0.9rem;
+        }
+        .card {
+          padding: 1.5rem;
+        }
+        .card h2 {
+          font-size: 1.4rem;
+        }
+        .chart-container {
+          height: 250px;
+        }
+        .empirical-title {
+          font-size: 1.5rem;
+        }
+        .correlation-display {
+          font-size: 3rem;
+        }
+        .association-result {
+          font-size: 1.1rem;
+          padding: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header {
+          padding: 1rem;
+        }
+        .header h1 {
+          font-size: 1.8rem;
+          line-height: 1.2;
+        }
+        .subtitle {
+          font-size: 1rem;
+        }
+        .metrics-grid {
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+        .metric-value {
+          font-size: 1.8rem;
+        }
+        .metric-label {
+          font-size: 0.9rem;
+        }
+        .strategic-matrix,
+        .strategic-matrix-3x3 {
+          height: auto;
+          gap: 0.5rem;
+        }
+        .matrix-quadrant {
+          padding: 0.8rem;
+        }
+        .quadrant-title {
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+        }
+        .quadrant-metric {
+          font-size: 0.8rem;
+          margin: 0.2rem 0;
+        }
+        .chart-container {
+          height: 200px;
+        }
+        .correlation-display {
+          font-size: 2.5rem;
+        }
+        .empirical-title {
+          font-size: 1.3rem;
+        }
+        .card {
+          padding: 1rem;
+        }
+        .card h2 {
+          font-size: 1.2rem;
+        }
+        .insight-title {
+          font-size: 1rem;
+        }
+        .insight-text {
+          font-size: 0.9rem;
+        }
+        .header-button {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.8rem;
+        }
+        div[style*="flex"] {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Technical Debt as a Strategic Trade-Off in Technology Ventures</h1>
+      <div class="subtitle">
+        An Empirical Analysis of Code Quality, Development Velocity, and Funding
+        Success
+      </div>
+      <div class="research-question">
+        <strong>Research Questions:</strong>
+        <br /><b>RQ1:</b> What is the statistical relationship between the
+        accumulation of technical debt and development velocity in
+        venture-backed software companies? <br /><b>RQ2:</b> How do technical
+        debt and development velocity, individually and in combination,
+        associate with a startup's ability to secure subsequent rounds of
+        funding?
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" id="totalVentures">-</div>
+          <div class="metric-label">Startups in Sample</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="totalPeriods">-</div>
+          <div class="metric-label">Development Periods</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="avgGrowth">-</div>
+          <div class="metric-label">Median Funding Growth</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="rSquared">-</div>
+          <div class="metric-label">TDR/Velocity R²</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="successRate">-</div>
+          <div class="metric-label">Follow-on Funding Rate</div>
+        </div>
+      </div>
+
+      <div class="card empirical-section">
+        <div class="empirical-title">
+          Primary Finding: The Relationship Between Technical Debt & Development
+          Velocity
+        </div>
+        <div class="limitation-note">
+          <strong>Methodology:</strong> Pearson correlation and simple linear
+          regression of Technical Debt Ratio vs. a composite Development
+          Velocity metric across a panel of 70 startups (N=120 observations).
+          The per-company analysis addresses data independence.
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+          "
+        >
+          <div>
+            <div class="metric-label">Per-Period Correlation</div>
+            <div class="correlation-display" id="correlationDisplay">
+              r = -0.155
+            </div>
+            <div class="association-result" id="associationResult">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+            <div
+              id="empiricalDetails"
+              style="margin-top: 1rem; font-size: 1.1rem; color: #64748b"
+            ></div>
+          </div>
+          <div>
+            <div class="metric-label">Per-Company Correlation</div>
+            <div class="correlation-display" id="companyCorrelationDisplay">
+              r = -0.210
+            </div>
+            <div class="association-result" id="companyAssociationResult">
+              <div class="loading"><div class="spinner"></div></div>
+            </div>
+            <div
+              id="companyEmpiricalDetails"
+              style="margin-top: 1rem; font-size: 1.1rem; color: #64748b"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="card" style="grid-column: 1 / -1">
+          <h2>🎯 Strategic Framework: Debt-Velocity Matrix (Median Split)</h2>
+          <p style="margin-bottom: 1.5rem; color: #64748b; font-size: 1.1rem">
+            Startups categorized by median splits of Technical Debt Ratio and
+            Development Velocity.
+            <strong>Success</strong> = secured follow-on funding round.
+          </p>
+          <div class="strategic-matrix">
+            <div class="matrix-quadrant quadrant-sustainable">
+              <div class="quadrant-title">Sustainable Growth</div>
+              <div class="quadrant-metric">Low Debt, High Velocity</div>
+              <div class="quadrant-metric">
+                <span id="sustainableCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="sustainableGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="sustainableSuccess">-</span>% success rate
+              </div>
+            </div>
+
+            <div class="matrix-quadrant quadrant-strategic">
+              <div class="quadrant-title">Strategic Debt</div>
+              <div class="quadrant-metric">High Debt, High Velocity</div>
+              <div class="quadrant-metric">
+                <span id="speedCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="speedGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="speedSuccess">-</span>% success rate
+              </div>
+            </div>
+
+            <div class="matrix-quadrant quadrant-premature">
+              <div class="quadrant-title">Premature Optimization</div>
+              <div class="quadrant-metric">Low Debt, Low Velocity</div>
+              <div class="quadrant-metric">
+                <span id="prematureCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="prematureGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="prematureSuccess">-</span>% success rate
+              </div>
+            </div>
+
+            <div class="matrix-quadrant quadrant-trap">
+              <div class="quadrant-title">The Debt Trap</div>
+              <div class="quadrant-metric">High Debt, Low Velocity</div>
+              <div class="quadrant-metric">
+                <span id="trapCount">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="trapGrowth">-</span>% growth
+              </div>
+              <div class="quadrant-metric">
+                <span id="trapSuccess">-</span>% success rate
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column: 1 / -1">
+          <h2>🔬 Sensitivity Analysis: Alternative Frameworks</h2>
+          <p style="margin-bottom: 1.5rem; color: #64748b; font-size: 1.1rem">
+            Testing the robustness of the strategic framework using different
+            statistical cuts (terciles and quartiles) to ensure the conclusions
+            are not an artifact of using medians.
+          </p>
+
+          <h3 style="margin-top: 2rem; font-size: 1.4rem; color: #1e3a8a">
+            3x3 Debt-Velocity Matrix (Tertile Split)
+          </h3>
+          <p style="margin-bottom: 1rem; color: #64748b">
+            Groups are split into Low (bottom 33%), Medium (middle 33%), and
+            High (top 33%) for a more granular view.
+          </p>
+          <div class="strategic-matrix-3x3">
+            <div class="matrix-quadrant quadrant-sustainable">
+              <div class="quadrant-title">Low Debt, High Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_ldhv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_ldhv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-accelerating">
+              <div class="quadrant-title">Medium Debt, High Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_mdhv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_mdhv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-strategic">
+              <div class="quadrant-title">High Debt, High Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_hdhv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_hdhv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-premature">
+              <div class="quadrant-title">Low Debt, Med Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_ldmv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_ldmv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-balanced">
+              <div class="quadrant-title">Medium Debt, Med Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_mdmv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_mdmv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-medium-risk">
+              <div class="quadrant-title">High Debt, Med Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_hdmv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_hdmv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-premature">
+              <div class="quadrant-title">Low Debt, Low Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_ldlv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_ldlv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-balanced">
+              <div class="quadrant-title">Medium Debt, Low Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_mdlv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_mdlv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-trap">
+              <div class="quadrant-title">High Debt, Low Velo</div>
+              <div class="quadrant-metric">
+                <span id="t_hdlv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="t_hdlv_s">-</span>% success
+              </div>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 2.5rem; font-size: 1.4rem; color: #1e3a8a">
+            2x2 Debt-Velocity Matrix (Quartile Extremes)
+          </h3>
+          <p style="margin-bottom: 1rem; color: #64748b">
+            Compares the most extreme groups: the bottom 25% vs. the top 25% for
+            both metrics, ignoring the middle 50%.
+          </p>
+          <div class="strategic-matrix">
+            <div class="matrix-quadrant quadrant-sustainable">
+              <div class="quadrant-title">Cleanest & Fastest</div>
+              <div class="quadrant-metric">Bottom 25% Debt, Top 25% Velo</div>
+              <div class="quadrant-metric">
+                <span id="q_ldhv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="q_ldhv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-strategic">
+              <div class="quadrant-title">Riskiest & Fastest</div>
+              <div class="quadrant-metric">Top 25% Debt, Top 25% Velo</div>
+              <div class="quadrant-metric">
+                <span id="q_hdhv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="q_hdhv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-premature">
+              <div class="quadrant-title">Cleanest & Slowest</div>
+              <div class="quadrant-metric">
+                Bottom 25% Debt, Bottom 25% Velo
+              </div>
+              <div class="quadrant-metric">
+                <span id="q_ldlv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="q_ldlv_s">-</span>% success
+              </div>
+            </div>
+            <div class="matrix-quadrant quadrant-trap">
+              <div class="quadrant-title">Riskiest & Slowest</div>
+              <div class="quadrant-metric">Top 25% Debt, Bottom 25% Velo</div>
+              <div class="quadrant-metric">
+                <span id="q_hdlv_c">-</span> startups
+              </div>
+              <div class="quadrant-metric">
+                <span id="q_hdlv_s">-</span>% success
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="correlation-section">
+          <h2>📊 Correlation Matrix & Key Relationships</h2>
+          <div class="correlation-grid">
+            <div class="correlation-card">
+              <div class="correlation-title">
+                Technical Debt ↔ Development Velocity
+              </div>
+              <div class="correlation-stats">
+                <span>Pearson's r (Per-Period):</span>
+                <strong id="corrDebtAgility">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>Pearson's r (Per-Company):</span>
+                <strong id="corrDebtAgilityCompany">-</strong>
+              </div>
+            </div>
+
+            <div class="correlation-card">
+              <div class="correlation-title">
+                Technical Debt ↔ Funding Growth
+              </div>
+              <div class="correlation-stats">
+                <span>Pearson's r:</span>
+                <strong id="corrDebtFunding">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>p-value:</span>
+                <strong id="pValueDebtFunding">-</strong>
+              </div>
+            </div>
+
+            <div class="correlation-card">
+              <div class="correlation-title">
+                Development Velocity ↔ Funding Growth
+              </div>
+              <div class="correlation-stats">
+                <span>Pearson's r:</span>
+                <strong id="corrAgilityFunding">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>p-value:</span>
+                <strong id="pValueAgilityFunding">-</strong>
+              </div>
+            </div>
+
+            <div class="correlation-card">
+              <div class="correlation-title">TDR Change ↔ Funding Growth</div>
+              <div class="correlation-stats">
+                <span>Pearson's r:</span>
+                <strong id="corrTDRChangeFunding">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>p-value:</span>
+                <strong id="pValueTDRChangeFunding">-</strong>
+              </div>
+            </div>
+
+            <div class="correlation-card">
+              <div class="correlation-title">Statistical Details</div>
+              <div class="correlation-stats">
+                <span>Sample Size (N periods):</span>
+                <strong id="sampleSize">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>p-value (TDR↔V, Period):</span>
+                <strong id="pValue">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>p-value (TDR↔V, Company):</span>
+                <strong id="pValueCompany">-</strong>
+              </div>
+            </div>
+            <div class="correlation-card">
+              <div class="correlation-title">Significance Level</div>
+              <div class="correlation-stats">
+                <span>(TDR↔V, Period):</span>
+                <strong id="significanceLevel">-</strong>
+              </div>
+              <div class="correlation-stats">
+                <span>(TDR↔V, Company):</span>
+                <strong id="significanceLevelCompany">-</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📈 Performance by Technical Debt Level</h2>
+          <p style="margin-bottom: 1rem; color: #64748b; font-size: 0.95rem">
+            Startups divided into quartiles by Technical Debt Ratio (TDR). Q1 =
+            Lowest TDR (cleanest code), Q4 = Highest TDR (most technical debt).
+          </p>
+          <div class="chart-container">
+            <canvas id="debtQuartileChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>⚡ Performance by Development Velocity Level</h2>
+          <p style="margin-bottom: 1rem; color: #64748b; font-size: 0.95rem">
+            Startups divided into quartiles by Development Velocity. Q1 =
+            Slowest development, Q4 = Fastest development.
+          </p>
+          <div class="chart-container">
+            <canvas id="agilityQuartileChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column: 1 / -1">
+          <h2>🚀 Performance by Market Category</h2>
+          <div class="chart-container">
+            <canvas id="marketCategoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="insights-section">
+        <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem">
+          🚀 Discussion & Implications
+        </h2>
+        <div class="insights-grid">
+          <div class="insight-card">
+            <div class="insight-title">Primary Finding</div>
+            <div class="insight-text" id="primaryFinding">Loading...</div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-title">Data Quality Assessment</div>
+            <div class="insight-text" id="dataQualityNote">Loading...</div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-title">Practical Implications</div>
+            <div class="insight-text" id="practicalImplication">Loading...</div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-title">Study Limitations</div>
+            <div class="insight-text" id="studyLimitations">Loading...</div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-title">Answering RQ1: Debt & Velocity</div>
+            <div class="insight-text" id="rq1_answer">Loading...</div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-title">Answering RQ2: Funding Success</div>
+            <div class="insight-text" id="rq2_answer">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let debtChart, agilityChart, marketCategoryChart;
+
+      async function loadData() {
+        const isLocalhost =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+
+        try {
+          const endpoint = isLocalhost
+            ? "/api/analytics"
+            : "../../data/analytics-results-data.json";
+
+          const response = await fetch(endpoint);
+
+          const data = await response.json();
+          renderDashboard(data);
+        } catch (error) {
+          console.error("❌ Failed to load analytics:", error);
+        }
+      }
+
+      function renderDashboard(data) {
+        updateMetrics(data);
+        updateFramework(data);
+        updateSensitivityFrameworks(data);
+        updateEmpirical(data);
+        updateCorrelations(data);
+        updateCharts(data);
+        updateInsights(data);
+      }
+
+      function updateMetrics(data) {
+        document.getElementById("totalVentures").textContent =
+          data.summary.totalVentures;
+        document.getElementById("totalPeriods").textContent =
+          data.summary.validDataPoints;
+        document.getElementById("avgGrowth").textContent =
+          data.summary.avgFundingGrowthRate.toFixed(1) + "%";
+        document.getElementById("rSquared").textContent =
+          data.statisticalAnalysis.rSquared.toFixed(3);
+        document.getElementById("successRate").textContent =
+          data.summary.fundingSuccessRate.toFixed(1) + "%";
+      }
+
+      function updateFramework(data) {
+        const framework = data.strategicFramework;
+        document.getElementById("speedCount").textContent =
+          framework.highDebtHighVelocity.count;
+        document.getElementById("speedGrowth").textContent =
+          framework.highDebtHighVelocity.avgFundingGrowth.toFixed(1);
+        document.getElementById("speedSuccess").textContent =
+          framework.highDebtHighVelocity.successRate.toFixed(1);
+
+        document.getElementById("trapCount").textContent =
+          framework.highDebtLowVelocity.count;
+        document.getElementById("trapGrowth").textContent =
+          framework.highDebtLowVelocity.avgFundingGrowth.toFixed(1);
+        document.getElementById("trapSuccess").textContent =
+          framework.highDebtLowVelocity.successRate.toFixed(1);
+
+        document.getElementById("sustainableCount").textContent =
+          framework.lowDebtHighVelocity.count;
+        document.getElementById("sustainableGrowth").textContent =
+          framework.lowDebtHighVelocity.avgFundingGrowth.toFixed(1);
+        document.getElementById("sustainableSuccess").textContent =
+          framework.lowDebtHighVelocity.successRate.toFixed(1);
+
+        document.getElementById("prematureCount").textContent =
+          framework.lowDebtLowVelocity.count;
+        document.getElementById("prematureGrowth").textContent =
+          framework.lowDebtLowVelocity.avgFundingGrowth.toFixed(1);
+        document.getElementById("prematureSuccess").textContent =
+          framework.lowDebtLowVelocity.successRate.toFixed(1);
+      }
+
+      function updateSensitivityFrameworks(data) {
+        const tertile = data.sensitivityAnalysis.tertileFramework;
+        const quartile = data.sensitivityAnalysis.quartileFramework;
+
+        // 3x3 Tertile Matrix
+        document.getElementById("t_ldhv_c").textContent =
+          tertile.lowDebtHighVelocity.count;
+        document.getElementById("t_ldhv_s").textContent =
+          tertile.lowDebtHighVelocity.successRate.toFixed(1);
+        document.getElementById("t_mdhv_c").textContent =
+          tertile.medDebtHighVelocity.count;
+        document.getElementById("t_mdhv_s").textContent =
+          tertile.medDebtHighVelocity.successRate.toFixed(1);
+        document.getElementById("t_hdhv_c").textContent =
+          tertile.highDebtHighVelocity.count;
+        document.getElementById("t_hdhv_s").textContent =
+          tertile.highDebtHighVelocity.successRate.toFixed(1);
+
+        document.getElementById("t_ldmv_c").textContent =
+          tertile.lowDebtMedVelocity.count;
+        document.getElementById("t_ldmv_s").textContent =
+          tertile.lowDebtMedVelocity.successRate.toFixed(1);
+        document.getElementById("t_mdmv_c").textContent =
+          tertile.medDebtMedVelocity.count;
+        document.getElementById("t_mdmv_s").textContent =
+          tertile.medDebtMedVelocity.successRate.toFixed(1);
+        document.getElementById("t_hdmv_c").textContent =
+          tertile.highDebtMedVelocity.count;
+        document.getElementById("t_hdmv_s").textContent =
+          tertile.highDebtMedVelocity.successRate.toFixed(1);
+
+        document.getElementById("t_ldlv_c").textContent =
+          tertile.lowDebtLowVelocity.count;
+        document.getElementById("t_ldlv_s").textContent =
+          tertile.lowDebtLowVelocity.successRate.toFixed(1);
+        document.getElementById("t_mdlv_c").textContent =
+          tertile.medDebtLowVelocity.count;
+        document.getElementById("t_mdlv_s").textContent =
+          tertile.medDebtLowVelocity.successRate.toFixed(1);
+        document.getElementById("t_hdlv_c").textContent =
+          tertile.highDebtLowVelocity.count;
+        document.getElementById("t_hdlv_s").textContent =
+          tertile.highDebtLowVelocity.successRate.toFixed(1);
+
+        // 2x2 Quartile (Extremes) Matrix
+        document.getElementById("q_ldhv_c").textContent =
+          quartile.topLeft.count;
+        document.getElementById("q_ldhv_s").textContent =
+          quartile.topLeft.successRate.toFixed(1);
+        document.getElementById("q_hdhv_c").textContent =
+          quartile.topRight.count;
+        document.getElementById("q_hdhv_s").textContent =
+          quartile.topRight.successRate.toFixed(1);
+        document.getElementById("q_ldlv_c").textContent =
+          quartile.bottomLeft.count;
+        document.getElementById("q_ldlv_s").textContent =
+          quartile.bottomLeft.successRate.toFixed(1);
+        document.getElementById("q_hdlv_c").textContent =
+          quartile.bottomRight.count;
+        document.getElementById("q_hdlv_s").textContent =
+          quartile.bottomRight.successRate.toFixed(1);
+      }
+
+      function updateEmpirical(data) {
+        const stat = data.statisticalAnalysis;
+        // Per-period analysis
+        const correlation = stat.correlation_TDR_velocity;
+        const pValue = stat.pValue;
+        const isSignificant = pValue < 0.05;
+        const isMarginallySignificant = pValue < 0.1 && !isSignificant;
+
+        document.getElementById("correlationDisplay").textContent =
+          "r = " + correlation.toFixed(3);
+        const resultElement = document.getElementById("associationResult");
+        resultElement.className = `association-result ${
+          isSignificant || isMarginallySignificant
+            ? "association-supported"
+            : "association-not-supported"
+        }`;
+        resultElement.textContent = stat.significanceLevel.toUpperCase();
+        document.getElementById(
+          "empiricalDetails"
+        ).textContent = `p = ${pValue.toFixed(3)} | n = ${
+          data.summary.validDataPoints
+        } | R² = ${stat.rSquared.toFixed(3)}`;
+
+        // Per-company analysis
+        const companyCorrelation = stat.correlation_TDR_velocity_by_company;
+        const companyPValue = stat.pValue_by_company;
+        const companySignificance = stat.significanceLevel_by_company;
+        const companyIsSignificant = companyPValue < 0.05;
+        const companyIsMarginallySignificant =
+          companyPValue < 0.1 && !companyIsSignificant;
+
+        document.getElementById("companyCorrelationDisplay").textContent =
+          "r = " + companyCorrelation.toFixed(3);
+        const companyResultElement = document.getElementById(
+          "companyAssociationResult"
+        );
+        companyResultElement.className = `association-result ${
+          companyIsSignificant || companyIsMarginallySignificant
+            ? "association-supported"
+            : "association-not-supported"
+        }`;
+        companyResultElement.textContent = companySignificance.toUpperCase();
+        document.getElementById(
+          "companyEmpiricalDetails"
+        ).textContent = `p = ${companyPValue.toFixed(3)} | n = ${
+          data.summary.totalVentures
+        } companies`;
+      }
+
+      // FIX IS HERE: Check for null before calling .toFixed()
+      function updateCorrelations(data) {
+        const stat = data.statisticalAnalysis;
+
+        const formatNumber = (num) => (num !== null ? num.toFixed(3) : "N/A");
+
+        document.getElementById("corrDebtAgility").textContent = formatNumber(
+          stat.correlation_TDR_velocity
+        );
+        document.getElementById("corrDebtAgilityCompany").textContent =
+          formatNumber(stat.correlation_TDR_velocity_by_company);
+        document.getElementById("corrDebtFunding").textContent = formatNumber(
+          stat.correlation_TDR_funding
+        );
+        document.getElementById("corrAgilityFunding").textContent =
+          formatNumber(stat.correlation_velocity_funding);
+        document.getElementById("corrTDRChangeFunding").textContent =
+          formatNumber(stat.correlation_TDRchange_funding);
+        document.getElementById("pValueDebtFunding").textContent = formatNumber(
+          stat.pValue_TDR_funding
+        );
+        document.getElementById("pValueAgilityFunding").textContent =
+          formatNumber(stat.pValue_velocity_funding);
+        document.getElementById("pValueTDRChangeFunding").textContent =
+          formatNumber(stat.pValue_TDRchange_funding);
+        document.getElementById("sampleSize").textContent =
+          data.summary.validDataPoints;
+        document.getElementById("significanceLevel").textContent =
+          stat.significanceLevel;
+        document.getElementById("pValue").textContent = formatNumber(
+          stat.pValue
+        );
+        document.getElementById("significanceLevelCompany").textContent =
+          stat.significanceLevel_by_company;
+        document.getElementById("pValueCompany").textContent = formatNumber(
+          stat.pValue_by_company
+        );
+      }
+
+      function updateCharts(data) {
+        if (debtChart) debtChart.destroy();
+        const debtCtx = document
+          .getElementById("debtQuartileChart")
+          .getContext("2d");
+        debtChart = new Chart(debtCtx, {
+          type: "bar",
+          data: {
+            labels: data.fundingAnalysis.byTDRQuartile.map((q, i) => {
+              const quartileNames = [
+                "Q1 (Cleanest Code)",
+                "Q2 (Low TDR)",
+                "Q3 (High TDR)",
+                "Q4 (Most Tech Debt)",
+              ];
+              return quartileNames[i] || `Q${i + 1}`;
+            }),
+            datasets: [
+              {
+                label: "Success Rate (%)",
+                yAxisID: "y1",
+                data: data.fundingAnalysis.byTDRQuartile.map(
+                  (q) => q.successRate
+                ),
+                backgroundColor: "rgba(16, 185, 129, 0.8)",
+                borderColor: "#10b981",
+                borderWidth: 2,
+              },
+              {
+                label: "Funding Growth (%)",
+                yAxisID: "y",
+                data: data.fundingAnalysis.byTDRQuartile.map(
+                  (q) => q.avgFundingGrowth
+                ),
+                type: "line",
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                tension: 0.3,
+                borderWidth: 3,
+                pointBackgroundColor: "#3b82f6",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                },
+              },
+            },
+            scales: {
+              y: {
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Avg Funding Growth (%)",
+                  color: "#3b82f6",
+                },
+                grid: { color: "rgba(59, 130, 246, 0.1)" },
+                ticks: { color: "#3b82f6" },
+              },
+              y1: {
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Follow-on Funding Rate (%)",
+                  color: "#10b981",
+                },
+                grid: { drawOnChartArea: false },
+                ticks: { color: "#10b981" },
+              },
+              x: {
+                ticks: { color: "#64748b" },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+
+        if (agilityChart) agilityChart.destroy();
+        const agilityCtx = document
+          .getElementById("agilityQuartileChart")
+          .getContext("2d");
+        agilityChart = new Chart(agilityCtx, {
+          type: "bar",
+          data: {
+            labels: data.fundingAnalysis.byVelocityQuartile.map((q, i) => {
+              const quartileNames = [
+                "Q1 (Slowest)",
+                "Q2 (Low Velocity)",
+                "Q3 (High Velocity)",
+                "Q4 (Fastest)",
+              ];
+              return quartileNames[i] || `Q${i + 1}`;
+            }),
+            datasets: [
+              {
+                label: "Success Rate (%)",
+                yAxisID: "y1",
+                data: data.fundingAnalysis.byVelocityQuartile.map(
+                  (q) => q.successRate
+                ),
+                backgroundColor: [
+                  "rgba(239, 68, 68, 0.8)", // Q1 (Slowest) - Red
+                  "rgba(245, 158, 11, 0.8)", // Q2 - Orange
+                  "rgba(59, 130, 246, 0.8)", // Q3 - Blue
+                  "rgba(16, 185, 129, 0.8)", // Q4 (Fastest) - Green
+                ],
+                borderColor: ["#ef4444", "#f59e0b", "#3b82f6", "#10b981"],
+                borderWidth: 2,
+              },
+              {
+                label: "Funding Growth (%)",
+                yAxisID: "y",
+                data: data.fundingAnalysis.byVelocityQuartile.map(
+                  (q) => q.avgFundingGrowth
+                ),
+                type: "line",
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                tension: 0.3,
+                borderWidth: 3,
+                pointBackgroundColor: "#3b82f6",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                },
+              },
+            },
+            scales: {
+              y: {
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Avg Funding Growth (%)",
+                  color: "#3b82f6",
+                },
+                grid: { color: "rgba(59, 130, 246, 0.1)" },
+                ticks: { color: "#3b82f6" },
+              },
+              y1: {
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Follow-on Funding Rate (%)",
+                  color: "#10b981",
+                },
+                grid: { drawOnChartArea: false },
+                ticks: { color: "#10b981" },
+              },
+              x: {
+                ticks: { color: "#64748b" },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+
+        if (marketCategoryChart) marketCategoryChart.destroy();
+        const marketCtx = document
+          .getElementById("marketCategoryChart")
+          .getContext("2d");
+        marketCategoryChart = new Chart(marketCtx, {
+          type: "bar",
+          data: {
+            labels: data.fundingAnalysis.byMarketCategory.map(
+              (c) => c.category
+            ),
+            datasets: [
+              {
+                label: "Success Rate (%)",
+                data: data.fundingAnalysis.byMarketCategory.map(
+                  (c) => c.successRate
+                ),
+                backgroundColor: data.fundingAnalysis.byMarketCategory.map(
+                  (c, i) => {
+                    const colors = [
+                      "rgba(16, 185, 129, 0.8)",
+                      "rgba(59, 130, 246, 0.8)",
+                      "rgba(245, 158, 11, 0.8)",
+                      "rgba(239, 68, 68, 0.8)",
+                      "rgba(16, 185, 129, 0.6)",
+                      "rgba(59, 130, 246, 0.6)",
+                    ];
+                    return colors[i % colors.length];
+                  }
+                ),
+                borderColor: data.fundingAnalysis.byMarketCategory.map(
+                  (c, i) => {
+                    const colors = [
+                      "#10b981",
+                      "#3b82f6",
+                      "#f59e0b",
+                      "#ef4444",
+                      "#10b981",
+                      "#3b82f6",
+                    ];
+                    return colors[i % colors.length];
+                  }
+                ),
+                borderWidth: 2,
+              },
+              {
+                label: "Avg TDR",
+                data: data.fundingAnalysis.byMarketCategory.map(
+                  (c) => c.avgTDR
+                ),
+                type: "line",
+                borderColor: "#f59e0b",
+                backgroundColor: "rgba(245, 158, 11, 0.1)",
+                tension: 0.3,
+                yAxisID: "y1",
+                borderWidth: 3,
+                pointBackgroundColor: "#f59e0b",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Success Rate (%)",
+                  color: "#10b981",
+                },
+                grid: { color: "rgba(16, 185, 129, 0.1)" },
+                ticks: { color: "#10b981" },
+              },
+              y1: {
+                position: "right",
+                title: { display: true, text: "Avg TDR", color: "#f59e0b" },
+                grid: { drawOnChartArea: false },
+                ticks: { color: "#f59e0b" },
+              },
+              x: {
+                ticks: {
+                  color: "#64748b",
+                  maxRotation: 45,
+                  font: { size: 10 },
+                },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+      }
+
+      function updateInsights(data) {
+        // Use dynamic content from analytics
+        document.getElementById("primaryFinding").textContent =
+          data.insights.primaryFinding;
+        document.getElementById("dataQualityNote").textContent =
+          data.insights.dataQualityNote;
+        document.getElementById("practicalImplication").textContent =
+          data.insights.practicalImplication;
+        document.getElementById("studyLimitations").textContent =
+          data.insights.limitations;
+
+        // Dynamic RQ1 Answer based on actual correlation and significance
+        const correlation =
+          data.statisticalAnalysis.correlation_TDR_velocity_by_company;
+        const pValue = data.statisticalAnalysis.pValue_by_company;
+        const rSquared = Math.pow(correlation, 2);
+
+        const rq1Answer = `When controlling for data independence by averaging metrics per-company, the relationship remains weak and not statistically significant (r=${correlation.toFixed(
+          3
+        )}, p=${pValue.toFixed(
+          3
+        )}). This indicates that technical debt is not a meaningful predictor of a team's development velocity in this sample.`;
+
+        document.getElementById("rq1_answer").textContent = rq1Answer;
+
+        // Dynamic RQ2 Answer based on quartile analysis
+        const velocityQ1Success =
+          data.fundingAnalysis.byVelocityQuartile[0].successRate;
+        const velocityQ4Success =
+          data.fundingAnalysis.byVelocityQuartile[3].successRate;
+        const highVelLowDebt =
+          data.strategicFramework.lowDebtHighVelocity.successRate;
+        const highVelHighDebt =
+          data.strategicFramework.highDebtHighVelocity.successRate;
+
+        const rq2Answer = `Development velocity shows a clear association with funding success: the fastest quartile achieved a ${velocityQ4Success.toFixed(
+          1
+        )}% success rate versus ${velocityQ1Success.toFixed(
+          1
+        )}% for the slowest. Technical debt shows no clear pattern. Notably, both high-velocity groups ('Sustainable Growth' at ${highVelLowDebt.toFixed(
+          1
+        )}% and 'Strategic Debt' at ${highVelHighDebt.toFixed(
+          1
+        )}% success) significantly outperformed low-velocity groups, suggesting investors prioritize execution speed over internal code quality.`;
+
+        document.getElementById("rq2_answer").textContent = rq2Answer;
+      }
+
+      document.addEventListener("DOMContentLoaded", loadData);
+    </script>
+  </body>
+</html>

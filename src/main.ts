@@ -1,0 +1,342 @@
+import { db, importCSV } from "./db/db";
+import {
+  companies,
+  fundingRounds,
+  repositoryInfo,
+  codeSnapshots,
+  developmentPeriods,
+} from "./db/schema";
+import { eq } from "drizzle-orm";
+import { GitHandler } from "./collectors/git";
+import { QltyAnalyzer } from "./collectors/qlty";
+import { startDashboardServer } from "./web/server";
+import { analyseGrowthDynamics } from "./analytics";
+import fs from "fs";
+
+function displayMenu() {
+  console.log("\n🚀 Technical Debt & Funding Analysis");
+  console.log("Master's Thesis: Technical debt patterns in venture portfolios");
+  console.log("=".repeat(85));
+  console.log("1. 📊 Run Complete Analysis");
+  console.log("2. 📈 View Dashboard");
+  console.log("3. 🗑️ Clean repos");
+  console.log("4. ❌ Exit");
+}
+
+async function getUserChoice(): Promise<string> {
+  console.log("\nChoice: ");
+  for await (const line of console) {
+    return line.trim();
+  }
+  return "4";
+}
+
+async function processVenture(company: any) {
+  const gitHandler = new GitHandler(company.name, false);
+
+  try {
+    const repoPath = await gitHandler.cloneRepo(company.githubLink);
+
+    const rounds = await db
+      .select()
+      .from(fundingRounds)
+      .where(eq(fundingRounds.companyId, company.id));
+
+    const analysisPoints = [...rounds];
+    if (company.exitDate) {
+      analysisPoints.push({
+        id: -1,
+        companyId: company.id,
+        roundType: "exit",
+        roundDate: company.exitDate,
+        amountUsd: null,
+        isExtension: false,
+        createdAt: null,
+      });
+    }
+
+    analysisPoints.sort(
+      (a, b) =>
+        new Date(a.roundDate).getTime() - new Date(b.roundDate).getTime()
+    );
+
+    const snapshots: any[] = [];
+
+    for (const [index, round] of analysisPoints.entries()) {
+      const analysisDate = round.roundDate;
+      console.log(`  → Analyzing ${round.roundType} at ${analysisDate}`);
+
+      const commitHash = await gitHandler.checkoutDate(analysisDate);
+      if (!commitHash) {
+        console.log(
+          `  ⚠️ No commits found before ${analysisDate}, skipping ${round.roundType}`
+        );
+        continue;
+      }
+
+      const repoInfo = await gitHandler.analyzeRepository();
+
+      if (repoInfo.totalFiles < 10) {
+        console.log(
+          `  ⚠️ Repository too small at ${analysisDate} (${repoInfo.totalFiles} files), skipping`
+        );
+        continue;
+      }
+
+      const [repositoryInfoRecord] = await db
+        .insert(repositoryInfo)
+        .values({
+          companyId: company.id,
+          analysisDate: analysisDate,
+          totalFiles: repoInfo.totalFiles,
+          repoSizeMB: repoInfo.repoSizeMB,
+          commitCount: repoInfo.commitCount,
+          firstCommitDate: repoInfo.firstCommitDate,
+          lastCommitDate: repoInfo.lastCommitDate,
+        })
+        .returning();
+
+      const qltyAnalyzer = new QltyAnalyzer(
+        repoPath,
+        "./data/analysis_results",
+        company.name,
+        analysisDate,
+        round.roundType
+      );
+
+      console.log(
+        `  → Running code quality analysis for ${round.roundType}...`
+      );
+      const qltyMetrics = await qltyAnalyzer.runAnalysis();
+
+      if (qltyMetrics.linesOfCode < 100) {
+        console.log(
+          `  ⚠️ Insufficient code at ${analysisDate} (${qltyMetrics.linesOfCode} LOC), skipping`
+        );
+        continue;
+      }
+
+      const [snapshotRecord] = await db
+        .insert(codeSnapshots)
+        .values({
+          companyId: company.id,
+          fundingRoundId: round.id > 0 ? round.id : null,
+          repositoryInfoId: repositoryInfoRecord!.id,
+          snapshotDate: analysisDate,
+          commitHash,
+          linesOfCode: qltyMetrics.linesOfCode,
+          totalLines: qltyMetrics.totalLines,
+          complexity: qltyMetrics.complexity,
+          cognitiveComplexity: qltyMetrics.cognitiveComplexity,
+          totalFunctions: qltyMetrics.totalFunctions,
+          totalClasses: qltyMetrics.totalClasses,
+          totalFields: qltyMetrics.totalFields,
+          lackOfCohesion: qltyMetrics.lackOfCohesion,
+          totalIssues: qltyMetrics.totalIssues,
+          totalEffortMinutes: qltyMetrics.totalEffortMinutes,
+          averageEffortPerIssue: qltyMetrics.averageEffortPerIssue,
+          issuesByCategory: qltyMetrics.issuesByCategory,
+          issuesByLevel: qltyMetrics.issuesByLevel,
+          issuesByLanguage: qltyMetrics.issuesByLanguage,
+          highComplexityFunctions: qltyMetrics.highComplexityFunctions,
+          highComplexityFiles: qltyMetrics.highComplexityFiles,
+          manyParameterFunctions: qltyMetrics.manyParameterFunctions,
+          complexBooleanLogic: qltyMetrics.complexBooleanLogic,
+          deeplyNestedCode: qltyMetrics.deeplyNestedCode,
+          manyReturnStatements: qltyMetrics.manyReturnStatements,
+          totalCodeSmells: qltyMetrics.totalCodeSmells,
+          averageComplexity: qltyMetrics.averageComplexity,
+          maxComplexity: qltyMetrics.maxComplexity,
+          analysisSuccess: qltyMetrics.analysisSuccess,
+          analysisErrors: qltyMetrics.analysisErrors,
+          qltyVersion: qltyMetrics.qltyVersion,
+        })
+        .returning();
+
+      snapshots.push({
+        ...snapshotRecord,
+        roundInfo: round,
+      });
+    }
+
+    for (let i = 1; i < snapshots.length; i++) {
+      const fromSnapshot = snapshots[i - 1];
+      const toSnapshot = snapshots[i];
+      const fromRound = fromSnapshot.roundInfo;
+      const toRound = toSnapshot.roundInfo;
+
+      if (fromSnapshot.linesOfCode < 1000 || toSnapshot.linesOfCode < 1000) {
+        console.log(
+          `  ⚠️ Insufficient code for period analysis, skipping ${fromRound.roundType} to ${toRound.roundType}`
+        );
+        continue;
+      }
+
+      console.log(
+        `  → Recording development period from ${fromRound.roundType} to ${toRound.roundType}...`
+      );
+
+      const developmentActivityMetrics =
+        await gitHandler.calculateDevelopmentActivity(
+          fromSnapshot.snapshotDate,
+          toSnapshot.snapshotDate
+        );
+
+      const futureRounds = analysisPoints.filter(
+        (r) => new Date(r.roundDate) > new Date(toRound.roundDate) && r.id > 0
+      );
+      const gotNextRound = futureRounds.length > 0;
+
+      await db.insert(developmentPeriods).values({
+        companyId: company.id,
+        fromRoundId: fromRound.id > 0 ? fromRound.id : null,
+        toRoundId: toRound.id > 0 ? toRound.id : null,
+        periodDays: developmentActivityMetrics.periodDays,
+        commitCount: developmentActivityMetrics.commitCount,
+        authorCount: developmentActivityMetrics.authorCount,
+        gotNextRound,
+      });
+    }
+
+    console.log(
+      `  ✅ ${company.name} - ${snapshots.length} snapshots, ${
+        snapshots.length - 1
+      } periods`
+    );
+  } catch (error) {
+    console.error(`  ❌ ${company.name}: ${(error as Error).message}`);
+  } finally {
+    gitHandler.cleanup();
+  }
+}
+
+async function runCompleteAnalysis() {
+  console.log("🚀 Starting Technical Debt Analysis");
+  console.log("📋 Research: Technical debt patterns in venture portfolios");
+
+  const csvPath = "./data/startup_seed_data.csv";
+  if (fs.existsSync(csvPath)) {
+    console.log("📊 Importing venture portfolio data...");
+    await importCSV(csvPath);
+  } else {
+    console.log("❌ CSV not found: ./data/startup_seed_data.csv");
+    return;
+  }
+
+  const allVentures = await db.select().from(companies);
+  if (allVentures.length === 0) {
+    console.log("❌ No ventures found in database");
+    return;
+  }
+
+  console.log(`🏢 Processing ${allVentures.length} technology ventures...`);
+
+  for (let i = 0; i < allVentures.length; i++) {
+    const venture = allVentures[i];
+    console.log(`\n[${i + 1}/${allVentures.length}] ${venture!.name}`);
+    await processVenture(venture);
+  }
+
+  console.log("\n📈 Running Statistical Analysis...");
+  const analytics = await analyseGrowthDynamics();
+
+  console.log("\n🎯 TECHNICAL DEBT ANALYSIS RESULTS");
+  console.log("=".repeat(60));
+  console.log(`📊 Data Quality:`);
+  console.log(`   Total records: ${analytics.dataQuality.totalRecords}`);
+  console.log(
+    `   Valid TDR (0-1): ${analytics.dataQuality.recordsWithValidTDR}`
+  );
+  console.log(
+    `   Sufficient code (>5K LOC): ${analytics.dataQuality.recordsWithSufficientCode}`
+  );
+  console.log(
+    `   Used in analysis: ${analytics.dataQuality.recordsUsedInAnalysis}`
+  );
+
+  console.log(`\n📈 Statistical Results:`);
+  console.log(
+    `   TDR ↔ Velocity: r = ${analytics.statisticalAnalysis.correlation_TDR_velocity.toFixed(
+      3
+    )}`
+  );
+  console.log(
+    `   Significance: ${analytics.statisticalAnalysis.significanceLevel}`
+  );
+  console.log(`   R² = ${analytics.statisticalAnalysis.rSquared.toFixed(3)}`);
+  console.log(
+    `   p-value = ${analytics.statisticalAnalysis.pValue.toFixed(3)}`
+  );
+
+  console.log(`\n📊 Strategic Framework:`);
+  const framework = analytics.strategicFramework;
+  console.log(
+    `   Low Debt, High Velocity: ${
+      framework.lowDebtHighVelocity.count
+    } ventures, ${framework.lowDebtHighVelocity.avgFundingGrowth.toFixed(
+      1
+    )}% growth`
+  );
+  console.log(
+    `   High Debt, High Velocity: ${
+      framework.highDebtHighVelocity.count
+    } ventures, ${framework.highDebtHighVelocity.avgFundingGrowth.toFixed(
+      1
+    )}% growth`
+  );
+  console.log(
+    `   Low Debt, Low Velocity: ${
+      framework.lowDebtLowVelocity.count
+    } ventures, ${framework.lowDebtLowVelocity.avgFundingGrowth.toFixed(
+      1
+    )}% growth`
+  );
+  console.log(
+    `   High Debt, Low Velocity: ${
+      framework.highDebtLowVelocity.count
+    } ventures, ${framework.highDebtLowVelocity.avgFundingGrowth.toFixed(
+      1
+    )}% growth`
+  );
+
+  console.log(`\n💡 Key Finding:`);
+  console.log(`   ${analytics.insights.primaryFinding}`);
+
+  console.log(
+    "\n🌐 Launch dashboard (option 2) to see detailed visual results"
+  );
+}
+
+async function main() {
+  while (true) {
+    displayMenu();
+    const choice = await getUserChoice();
+
+    switch (choice) {
+      case "1":
+        await runCompleteAnalysis();
+        break;
+      case "2":
+        await startDashboardServer();
+        break;
+      case "3":
+        GitHandler.cleanAllRepos();
+        console.log("✅ All cloned repositories cleaned");
+        break;
+      case "4":
+        process.exit(0);
+        break;
+      default:
+        console.log("❌ Invalid choice. Please select 1-4.");
+    }
+
+    if (choice !== "2") {
+      console.log("\nPress Enter to continue...");
+      await getUserChoice();
+    }
+  }
+}
+
+if (import.meta.main) {
+  main().catch(console.error);
+}

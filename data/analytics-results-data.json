@@ -1,0 +1,289 @@
+{
+  "summary": {
+    "totalVentures": 70,
+    "validDataPoints": 146,
+    "filteredDataPoints": 7,
+    "avgFundingGrowthRate": 151.26262626262627,
+    "avgDaysBetweenRounds": 489,
+    "avgTechnicalDebtRatio": 0.03105056498579904,
+    "avgDevelopmentVelocity": 0.08943278496875273,
+    "fundingSuccessRate": 54.109589041095894
+  },
+  "dataQuality": {
+    "totalRecords": 153,
+    "recordsWithValidTDR": 153,
+    "recordsWithSufficientCode": 151,
+    "recordsUsedInAnalysis": 146,
+    "filteringReason": "Filtered 7 records: Required valid TDR, LOC > 5000, period > 90 days, & >10 commits."
+  },
+  "strategicFramework": {
+    "lowDebtHighVelocity": {
+      "count": 40,
+      "avgFundingGrowth": 144.54411743898171,
+      "successRate": 57.49999999999999,
+      "avgTDR": 0.0139000259060942,
+      "avgVelocity": 0.1847831570768406
+    },
+    "highDebtHighVelocity": {
+      "count": 33,
+      "avgFundingGrowth": 161.67843780133416,
+      "successRate": 60.60606060606061,
+      "avgTDR": 0.1334081282841796,
+      "avgVelocity": 0.22853152717702557
+    },
+    "lowDebtLowVelocity": {
+      "count": 33,
+      "avgFundingGrowth": 141.36906137733436,
+      "successRate": 45.45454545454545,
+      "avgTDR": 0.012995933567803802,
+      "avgVelocity": 0.047911579761069335
+    },
+    "highDebtLowVelocity": {
+      "count": 40,
+      "avgFundingGrowth": 272.5795847363353,
+      "successRate": 52.5,
+      "avgTDR": 0.09098211057640615,
+      "avgVelocity": 0.04574122603962574
+    }
+  },
+  "sensitivityAnalysis": {
+    "tertileFramework": {
+      "lowDebtLowVelocity": {
+        "count": 14,
+        "avgFundingGrowth": 92.21423528216187,
+        "successRate": 50,
+        "avgTDR": 0.006346914978134192,
+        "avgVelocity": 0.032920509969338256
+      },
+      "lowDebtMedVelocity": {
+        "count": 20,
+        "avgFundingGrowth": 133.7691905617602,
+        "successRate": 40,
+        "avgTDR": 0.008898882868977418,
+        "avgVelocity": 0.09120868868698553
+      },
+      "lowDebtHighVelocity": {
+        "count": 15,
+        "avgFundingGrowth": 60.52133830599177,
+        "successRate": 73.33333333333333,
+        "avgTDR": 0.008743484007723408,
+        "avgVelocity": 0.2212269597068201
+      },
+      "medDebtLowVelocity": {
+        "count": 17,
+        "avgFundingGrowth": 188.30505198347453,
+        "successRate": 52.94117647058824,
+        "avgTDR": 0.03629641963298276,
+        "avgVelocity": 0.04260904040954094
+      },
+      "medDebtMedVelocity": {
+        "count": 18,
+        "avgFundingGrowth": 209.51960685283115,
+        "successRate": 44.44444444444444,
+        "avgTDR": 0.03849564467858875,
+        "avgVelocity": 0.0914046246015488
+      },
+      "medDebtHighVelocity": {
+        "count": 14,
+        "avgFundingGrowth": 190.92285919208996,
+        "successRate": 50,
+        "avgTDR": 0.030087009721895767,
+        "avgVelocity": 0.23025710678319347
+      },
+      "highDebtLowVelocity": {
+        "count": 18,
+        "avgFundingGrowth": 385.322655831819,
+        "successRate": 44.44444444444444,
+        "avgTDR": 0.12062541736458351,
+        "avgVelocity": 0.028486448579875732
+      },
+      "highDebtMedVelocity": {
+        "count": 11,
+        "avgFundingGrowth": 126.12053141350687,
+        "successRate": 72.72727272727273,
+        "avgTDR": 0.12579446877933417,
+        "avgVelocity": 0.08460691005090647
+      },
+      "highDebtHighVelocity": {
+        "count": 19,
+        "avgFundingGrowth": 166.17765126902552,
+        "successRate": 68.42105263157895,
+        "avgTDR": 0.17591880157942974,
+        "avgVelocity": 0.3001823176289748
+      }
+    },
+    "quartileFramework": {
+      "bottomLeft": {
+        "count": 10,
+        "avgFundingGrowth": 73.02960159596316,
+        "successRate": 30,
+        "avgTDR": 0.004516910698424691,
+        "avgVelocity": 0.029961923026084903
+      },
+      "bottomRight": {
+        "count": 12,
+        "avgFundingGrowth": 366.45620596995076,
+        "successRate": 50,
+        "avgTDR": 0.13881640107762647,
+        "avgVelocity": 0.02560930996762649
+      },
+      "topLeft": {
+        "count": 8,
+        "avgFundingGrowth": 102.77326839826841,
+        "successRate": 62.5,
+        "avgTDR": 0.004272589985248808,
+        "avgVelocity": 0.24217619078653224
+      },
+      "topRight": {
+        "count": 12,
+        "avgFundingGrowth": 148.61356621773288,
+        "successRate": 66.66666666666666,
+        "avgTDR": 0.2293833815041247,
+        "avgVelocity": 0.3368726152249823
+      }
+    }
+  },
+  "statisticalAnalysis": {
+    "correlation_TDR_velocity": 0.22893467363998785,
+    "correlation_TDR_funding": 0.13433766765091937,
+    "correlation_velocity_funding": -0.24845509197461546,
+    "correlation_TDRchange_funding": 0.0904550960105108,
+    "correlation_TDR_velocity_by_company": 0.05612870426540401,
+    "pValue_by_company": 0.6672,
+    "significanceLevel_by_company": "Not Significant",
+    "regressionSlope": 0.3831434307880049,
+    "rSquared": 0.05241108479464775,
+    "pValue": 0.0047999999999999154,
+    "significanceLevel": "Significant (p<0.01)",
+    "pValue_TDR_funding": 0.3078000000000001,
+    "pValue_velocity_funding": 0.0524,
+    "pValue_TDRchange_funding": 0.49019999999999997
+  },
+  "fundingAnalysis": {
+    "byTDRQuartile": [
+      {
+        "quartile": "Q1",
+        "count": 36,
+        "avgFundingGrowth": 96.64528111354127,
+        "successRate": 44.44444444444444,
+        "avgTDR": 0.005574844151080884,
+        "avgVelocity": 0.10909869466658952
+      },
+      {
+        "quartile": "Q2",
+        "count": 36,
+        "avgFundingGrowth": 193.95183221200756,
+        "successRate": 61.111111111111114,
+        "avgTDR": 0.020935187481376794,
+        "avgVelocity": 0.1388132062218058
+      },
+      {
+        "quartile": "Q3",
+        "count": 36,
+        "avgFundingGrowth": 185.06402874955174,
+        "successRate": 52.77777777777778,
+        "avgTDR": 0.050289976761712325,
+        "avgVelocity": 0.10389433007926081
+      },
+      {
+        "quartile": "Q4",
+        "count": 38,
+        "avgFundingGrowth": 238.44364650845415,
+        "successRate": 57.89473684210527,
+        "avgTDR": 0.1647847157427723,
+        "avgVelocity": 0.14943614575737277
+      }
+    ],
+    "byVelocityQuartile": [
+      {
+        "quartile": "Q1",
+        "count": 36,
+        "avgFundingGrowth": 263.8912419161871,
+        "successRate": 47.22222222222222,
+        "avgTDR": 0.06439474850502717,
+        "avgVelocity": 0.029411890428761904
+      },
+      {
+        "quartile": "Q2",
+        "count": 36,
+        "avgFundingGrowth": 160.11518441484873,
+        "successRate": 50,
+        "avgTDR": 0.047017673329323426,
+        "avgVelocity": 0.0628606744042755
+      },
+      {
+        "quartile": "Q3",
+        "count": 36,
+        "avgFundingGrowth": 162.66235161006279,
+        "successRate": 50,
+        "avgTDR": 0.044605137149515514,
+        "avgVelocity": 0.11659011004447456
+      },
+      {
+        "quartile": "Q4",
+        "count": 38,
+        "avgFundingGrowth": 170.3565512118144,
+        "successRate": 68.42105263157895,
+        "avgTDR": 0.08973650992095494,
+        "avgVelocity": 0.28485635679014093
+      }
+    ],
+    "byMarketCategory": [
+      {
+        "category": "Developer Tools & DevOps",
+        "count": 46,
+        "avgFundingGrowth": 175.64424627279303,
+        "successRate": 58.69565217391305,
+        "avgTDR": 0.04305889537434156,
+        "avgVelocity": 0.11261451214875813
+      },
+      {
+        "category": "Database & Storage",
+        "count": 42,
+        "avgFundingGrowth": 157.38563024045476,
+        "successRate": 64.28571428571429,
+        "avgTDR": 0.08260446098548616,
+        "avgVelocity": 0.16070044151322269
+      },
+      {
+        "category": "Data Platform & Analytics",
+        "count": 28,
+        "avgFundingGrowth": 198.6225808214223,
+        "successRate": 50,
+        "avgTDR": 0.04912238936860384,
+        "avgVelocity": 0.1271362701533508
+      },
+      {
+        "category": "Business & Application Software",
+        "count": 20,
+        "avgFundingGrowth": 194.817797039621,
+        "successRate": 30,
+        "avgTDR": 0.06265532886084148,
+        "avgVelocity": 0.10758765092955877
+      },
+      {
+        "category": "AI / Machine Learning",
+        "count": 7,
+        "avgFundingGrowth": 240.97194730735103,
+        "successRate": 42.857142857142854,
+        "avgTDR": 0.05353047866578331,
+        "avgVelocity": 0.05398369118920606
+      },
+      {
+        "category": "Security",
+        "count": 3,
+        "avgFundingGrowth": 260.6349206349206,
+        "successRate": 66.66666666666666,
+        "avgTDR": 0.19109204053570572,
+        "avgVelocity": 0.10815244333603935
+      }
+    ]
+  },
+  "insights": {
+    "primaryFinding": "The primary analysis using per-period data shows a weak, statistically insignificant relationship (r=0.229) between technical debt and development velocity. Analysis using per-company averages to ensure data independence confirms this weak relationship.",
+    "dataQualityNote": "Analysis based on 146 high-quality development periods from a total of 153 records (4.6% filtered for quality). Key filters include LOC > 5000 and period length > 90 days.",
+    "practicalImplication": "For early-stage, venture-backed startups in this sample, there is no strong empirical evidence that accumulating technical debt significantly hampers development velocity. Instead, velocity appears to be a more critical driver of funding success, regardless of the underlying code quality.",
+    "limitations": "Limitations include: (1) Sample is limited to open-source startups, which may not represent all ventures. (2) Technical Debt Ratio (TDR) is a model-based estimate. (3) The analysis reflects a period of high capital availability (pre-2022), which may influence investor priorities."
+  },
+  "exportDate": "2025-09-18T11:46:57.150Z"
+}

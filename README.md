@@ -52,8 +52,8 @@ This project uses `bun` as the package manager for fast execution.
 
 ```bash
 # Clone the repository
-git clone https://github.com/maxcodefaster/tdr-velocity-analysis.git
-cd tdr-velocity-analysis
+git clone https://github.com/maxcodefaster/technical-debt-velocity-study.git
+cd technical-debt-velocity-study
 
 # Install dependencies
 bun install
@@ -74,7 +74,7 @@ bun run start
 ## Project Structure
 
 ```
-tdr-velocity-analysis/
+technical-debt-velocity-study/
 ├── data/
 │   ├── startup_seed_data.csv           # 70 venture-backed companies dataset
 │   ├── analytics-results-data.json     # Automatically generated results on dashboard reload

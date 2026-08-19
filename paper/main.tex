@@ -1,0 +1,48 @@
+\input{_imports}
+\begin{document}
+\include{_titlepage}
+\normalsize
+\tableofcontents
+\thispagestyle{empty}
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\pagenumbering{arabic} 
+\cleardoublepage
+%=========================================================================================
+\chapter*{List of Acronyms}
+\thispagestyle{empty}
+
+\begin{acronym}[xxxxxxxxxxxx]
+    \acro{TDR}{Technical Debt Ratio}
+    \acro{DV}{Development Velocity}
+    \acro{VC}{Venture Capital}
+    \acro{ZIRP}{Zero Interest-Rate Policy}
+    \acro{COCOMO}{Constructive Cost Model}
+    \acro{IQR}{interquartile range}
+\end{acronym}
+\newpage
+%=========================================================================================
+\include{chapters/0_abstract}
+\cleardoublepage
+\setcounter{page}{1} %erstes Kapitel ist Seite 1
+%=========================================================================================
+\include{chapters/1_introduction}
+\include{chapters/2_literature_review}
+\include{chapters/3_methodology}
+\include{chapters/4_results}
+\include{chapters/5_discussion}
+\include{chapters/6_conclusion}
+%=========================================================================================
+%Abbildungsverzeichnis
+\begingroup
+\listoffigures
+\endgroup
+%Tabellenverzeichnis
+\listoftables
+%Literaturverzeichnis
+\bibliographystyle{apacite}
+\bibliography{references}
+
+\newpage
+\include{chapters/a_appendix}
+
+\end{document}

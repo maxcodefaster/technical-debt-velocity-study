@@ -1,27 +1,40 @@
-# Master's Thesis: Technical Debt as a Strategic Trade-Off in Venture-Backed Startups
+# Technical Debt, Development Velocity, and Funding Success
 
-An empirical analysis of the relationship between technical debt, development velocity, and funding success in venture-backed software companies.
+Research artifacts for the master's thesis **Technical Debt as a Strategic
+Trade-Off: An Empirical Analysis of Execution Speed and Funding Success in
+Venture-Backed Startups**.
+
+This repository contains both the final thesis and the reproducible analysis
+implementation:
+
+- [`paper/`](./paper/) contains the LaTeX source of the final thesis.
+- [`Master_Thesis.pdf`](./Master_Thesis.pdf) is the compiled thesis.
+- [`src/`](./src/) contains the collection, analysis, and dashboard code.
+- [`data/`](./data/) contains the research inputs and generated results.
 
 ## Abstract
 
-This study investigates the relationship between technical debt and performance in technology startups, challenging the conventional wisdom that technical debt is universally detrimental. The core conflict for startups between the need for high-speed execution and the risk of accumulating technical debt is well-documented but lacks large-scale empirical analysis. 
+The study examines 70 open-source, venture-backed companies across 146 funding
+periods. The final company-level analysis found no systematic constraint of
+technical debt on development velocity within the observed range (`r = 0.056`,
+`p = 0.667`). Development velocity was a substantially stronger predictor of
+funding success than technical debt levels, and the high-debt, high-velocity
+quadrant showed the highest observed success rate at 60.6%.
 
-This research addresses that gap through a novel, automated analysis of **70 open-source, venture-backed companies**, examining code quality (via Technical Debt Ratio) and development speed (using a composite velocity metric) across **146 distinct inter-funding periods**.
+The result is contextual rather than causal: in the observed post-2008,
+capital-abundant environment, execution speed was more strongly associated with
+funding success than internal debt levels. See the final thesis for the complete
+methodology, limitations, and interpretation.
 
-**Key Finding:** The analysis revealed a **weak but statistically significant positive correlation (r = 0.229, p = 0.005)** between technical debt and development velocity, contrary to conventional wisdom. More significantly, high-velocity development emerged as a strong predictor of funding success. The highest-performing quadrant combines **high technical debt with high velocity (60.6% success rate)**, suggesting that strategic debt accumulation may actually enable faster execution in venture-backed environments.
+## Research Question
 
-This thesis contributes a reproducible, large-scale methodology for technical debt analysis and provides empirical evidence that reframes technical debt as a nuanced strategic instrument rather than a simple liability.
-
-## Research Questions
-
-* **RQ1:** What is the statistical relationship between the accumulation of technical debt and development velocity in venture-backed software companies?
-
-* **RQ2:** How do technical debt and development velocity, individually and in combination, associate with a startup's ability to secure subsequent rounds of funding?
+How do technical debt and development velocity, individually and in
+combination, associate with a startup's ability to secure subsequent rounds of
+funding?
 
 ## Key Findings
 
-- **Weak positive correlation** between technical debt and development velocity (r = 0.229, p < 0.01)
-- **Technical debt explains 5.2%** of the variance in development velocity (R² = 0.052)
+- **No systematic company-level relationship** between technical debt and development velocity (`r = 0.056`, `p = 0.667`)
 - **High-velocity development is the critical factor** for funding success across all debt levels
 - **Strategic debt quadrant performs best** with 60.6% funding success rate (High Debt + High Velocity)
 - **Velocity matters more than debt levels** - high-velocity startups succeed regardless of technical debt
@@ -39,8 +52,8 @@ This project uses `bun` as the package manager for fast execution.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd technical-debt-thesis
+git clone https://github.com/maxcodefaster/tdr-velocity-analysis.git
+cd tdr-velocity-analysis
 
 # Install dependencies
 bun install
@@ -61,12 +74,13 @@ bun run start
 ## Project Structure
 
 ```
-technical-debt-thesis/
+tdr-velocity-analysis/
 ├── data/
 │   ├── startup_seed_data.csv           # 70 venture-backed companies dataset
 │   ├── analytics-results-data.json     # Automatically generated results on dashboard reload
 │   └── analysis.db                     # SQLite database (generated)
 ├── drizzle/                            # Database migrations
+├── paper/                              # Final LaTeX thesis source
 ├── repos/                              # Cloned repositories (generated during analysis)
 ├── src/
 │   ├── analytics/                      # Statistical analysis & research logic
@@ -162,10 +176,9 @@ The interactive dashboard provides:
 
 | Metric | Value | Significance |
 |--------|--------|-------------|
-| **TDR ↔ Velocity Correlation** | r = 0.229 | p < 0.01 ✓ |
+| **TDR ↔ Velocity Correlation** | r = 0.056 | p = 0.667 (company-level) |
 | **TDR ↔ Funding Correlation** | r = 0.134 | Not Significant |
 | **Velocity ↔ Funding Correlation** | r = -0.248 | Not Significant |
-| **Explained Variance (R²)** | 5.2% | TDR explains velocity |
 | **Sample Size** | 146 periods | High statistical power |
 | **Companies Analyzed** | 70 ventures | Diverse portfolio |
 
